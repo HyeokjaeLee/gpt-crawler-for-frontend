@@ -1,5 +1,19 @@
-import { defaultConfig } from "../config.js";
-import { crawl, write } from "./core.js";
+/** @format */
 
-await crawl(defaultConfig);
-await write(defaultConfig);
+import {configList} from "../config.js";
+import type {Config} from "./config.js";
+import {crawl, write} from "./core.js";
+
+Promise.all(
+  configList.map(async ({title, ...restConfig}) => {
+    const dateText = new Date().toISOString().split("T")[0];
+    const fullConfig: Config = {
+      ...restConfig,
+      maxPagesToCrawl: 99999,
+      outputFileName: `${title}-${dateText}.json`,
+    };
+
+    await crawl(fullConfig);
+    await write(fullConfig);
+  })
+);
